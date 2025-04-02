@@ -1,16 +1,17 @@
-// backend/middleware/auth.js
 import jwt from 'jsonwebtoken';
 
-export const adminAuth = (req, res, next) => {
+// Authentication Middleware (for all protected routes)
+export const auth = (req, res, next) => {
   const token = req.headers['token'];
   if (!token) return res.json({ success: false, message: 'No token provided' });
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (decoded.role !== 'admin') throw new Error();
-    req.adminId = decoded.id;
+    req.userId = decoded.id; // Attach user ID to request
     next();
   } catch (error) {
     return res.json({ success: false, message: 'Unauthorized' });
   }
 };
+
+// Remove adminAuth entirely (no role-based access)

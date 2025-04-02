@@ -1,77 +1,91 @@
-const { Order, Product } = require('../config/database');
+import Order from "../models/orderModel.js";
 
-const placeOrder = async (req, res) => {
-  try {
-    const { items, amount, address } = req.body;
-    const userId = req.userId; 
-
-    const order = await Order.create({
-      userId,
-      items,
-      amount,
-      address,
-    });
-
-    return res.json({ success: true, message: 'Order placed successfully' });
-  } catch (error) {
-    return res.json({ success: false, message: 'Error placing order' });
-  }
-};
-
-const listOrders = async (req, res) => {
+// List all orders (accessible to all authenticated users)
+export const listOrders = async (req, res) => {
   try {
     const orders = await Order.findAll();
     return res.json({ success: true, data: orders });
   } catch (error) {
-    return res.json({ success: false, message: 'Error fetching orders' });
+    console.error("Error fetching orders:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-const updateStatus = async (req, res) => {
+// Update order status (accessible to all authenticated users)
+export const updateStatus = async (req, res) => {
   try {
     const { orderId, status } = req.body;
 
-    // Validate status
-    const validStatuses = ['Processing', 'Shipped', 'Delivered'];
+    // Validate status against allowed values
+    const validStatuses = ["Processing", "Shipped", "Delivered"];
     if (!validStatuses.includes(status)) {
-      return res.json({ success: false, message: 'Invalid status' });
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid status. Valid options: Processing, Shipped, Delivered" 
+      });
     }
 
     const order = await Order.findByPk(orderId);
     if (!order) {
-      return res.json({ success: false, message: 'Order not found' });
+      return res.status(404).json({ success: false, message: "Order not found" });
     }
 
     await order.update({ status });
-    return res.json({ success: true, message: 'Status updated successfully' });
+    return res.json({ success: true, message: "Status updated successfully" });
   } catch (error) {
-    return res.json({ success: false, message: 'Error updating status' });
+    console.error("Error updating status:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-const userOrders = async (req, res) => {
+// Place a new order
+export const placeOrder = async (req, res) => {
   try {
-    const userId = req.userId; 
+    const { userId, items, amount, address, payment } = req.body;
+
+    // Validate required fields
+    if (!userId || !items || !amount || !address) {
+      return res.status(400).json({ success: false, message: "Missing required fields" });
+    }
+
+    const newOrder = await Order.create({ userId, items, amount, address, payment });
+    return res.status(201).json({ success: true, data: newOrder });
+  } catch (error) {
+    console.error("Error placing order:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// Get orders for a specific user
+export const userOrders = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "Missing userId" });
+    }
     const orders = await Order.findAll({ where: { userId } });
     return res.json({ success: true, data: orders });
   } catch (error) {
-    return res.json({ success: false, message: 'Error fetching user orders' });
+    console.error("Error fetching user orders:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-const verifyOrder = async (req, res) => {
+// Verify an order by orderId
+export const verifyOrder = async (req, res) => {
   try {
-    const { orderId, success } = req.body;
+    const { orderId } = req.body;
+    if (!orderId) {
+      return res.status(400).json({ success: false, message: "Missing orderId" });
+    }
     const order = await Order.findByPk(orderId);
     if (!order) {
-      return res.json({ success: false, message: 'Order not found' });
+      return res.status(404).json({ success: false, message: "Order not found" });
     }
-
-    await order.update({ payment: success });
-    return res.json({ success: true, message: 'Payment verified' });
+    // You can add more verification logic here if needed.
+    return res.json({ success: true, message: "Order verified", data: order });
   } catch (error) {
-    return res.json({ success: false, message: 'Error verifying payment' });
+    console.error("Error verifying order:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
-
-module.exports = { placeOrder, listOrders, updateStatus, userOrders, verifyOrder };
