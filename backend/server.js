@@ -1,5 +1,4 @@
 import express from "express";
-import cors from "cors";
 import { sequelize } from "./config/db.js";
 import userRouter from "./routes/userRoute.js";
 import productRouter from "./routes/productRoute.js";
@@ -19,10 +18,6 @@ if (!process.env.DB_NAME || !process.env.DB_USER) {
 
 // Middlewares
 app.use(express.json());
-app.use(cors({
-  origin: 'http://localhost:3000', 
-  credentials: true,
-}));
 app.use("/images", express.static("uploads"));
 
 // Sync Database
@@ -39,7 +34,7 @@ sequelize.sync({ alter: true })
 
 // API Endpoints
 app.use("/api/user", userRouter);
-app.use("/api/food", productRouter);
+app.use("/api/product", productRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
 

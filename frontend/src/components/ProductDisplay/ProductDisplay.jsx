@@ -1,34 +1,30 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import './ProductDisplay.css';
-import { StoreContext } from '../../Context/StoreContext';
 import ProductItem from '../ProductItem/ProductItem';
+import { StoreContext } from '../../Context/StoreContext';
 
 const ProductDisplay = ({ category }) => {
-  const { product_list } = useContext(StoreContext);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-
-  useEffect(() => {
-    if (category === 'All') {
-      setFilteredProducts(product_list);
-    } else {
-      setFilteredProducts(product_list.filter((item) => item.category === category));
-    }
-  }, [category, product_list]);
+  const { product_list = [] } = useContext(StoreContext); 
 
   return (
     <div className='product-display' id='product-display'>
       <h2>Top Gym Products for You</h2>
       <div className='product-display-list'>
-        {filteredProducts.map((item) => (
-          <ProductItem
-            key={item.id}
-            id={item.id}
-            name={item.name}
-            description={item.description}
-            price={item.price}
-            image={item.image}
-          />
-        ))}
+        {product_list.map((item) => {
+          if (category === "All" || category === item.category) {
+            return (
+              <ProductItem
+                key={item.id}
+                id={item.id}
+                name={item.name}
+                description={item.description}
+                price={item.price}
+                image={item.image}
+              />
+            );
+          }
+          return null;  
+        })}
       </div>
     </div>
   );
