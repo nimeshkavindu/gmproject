@@ -10,12 +10,12 @@ const Orders = () => {
   // Fetch all orders from API
   const fetchAllOrders = async () => {
     try {
-      const response = await axios.get(`${url}/order/list`, {
+      const response = await axios.get(`${url}/api/order/list`, {
         headers: { token: localStorage.getItem('adminToken') },
       });
 
       if (response.data.success) {
-        setOrders([...response.data.data].reverse()); // Create a new reversed array
+        setOrders([...response.data.data].reverse()); 
       } else {
         toast.error('Error fetching orders');
       }
