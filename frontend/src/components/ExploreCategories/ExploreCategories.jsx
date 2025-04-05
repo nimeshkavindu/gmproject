@@ -9,12 +9,15 @@ const ExploreCategories = ({ category, setCategory }) => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${url}/product/list`); 
+      const response = await axios.get(`${url}/api/product/list`);
       const products = response.data.data;
-      const uniqueCategories = [
-        'All',
-        ...new Set(products.map((item) => item.category)),
-      ];
+
+      // Filter out null/undefined/empty category strings
+      const validCategories = products
+        .map((item) => item.category?.trim())
+        .filter((cat) => cat && cat !== "");
+
+      const uniqueCategories = ['All', ...new Set(validCategories)];
       setCategories(uniqueCategories);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -32,10 +35,10 @@ const ExploreCategories = ({ category, setCategory }) => {
         Browse our wide range of gym products by category to find exactly what you need for your fitness journey.
       </p>
       <div className='explore-categories-list'>
-        {categories.map((item, index) => (
+        {categories.map((item) => (
           <div
+            key={item}
             onClick={() => setCategory(item)}
-            key={index}
             className={`explore-categories-item ${category === item ? 'active' : ''}`}
           >
             <p>{item}</p>

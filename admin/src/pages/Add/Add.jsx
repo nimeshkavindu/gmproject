@@ -30,7 +30,7 @@ const Add = () => {
     }
 
     try {
-      const response = await axios.post(`${url}/product/add`, formData, {
+      const response = await axios.post(`${url}/api/product/add`, formData, {
         headers: { token: localStorage.getItem('adminToken') },
       });
 
