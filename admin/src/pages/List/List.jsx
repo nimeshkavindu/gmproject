@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { url } from '../../assets/assets';
-
+import './List.css';
 const List = () => {
   const [list, setList] = useState([]);
 
   const fetchList = async () => {
     try {
-      const response = await axios.get(`${url}/product/list`, {
+      const response = await axios.get(`${url}/api/product/list`, {
         headers: { token: localStorage.getItem('adminToken') },
       });
 
@@ -25,7 +25,7 @@ const List = () => {
   const removeProduct = async (productId) => {
     try {
       const response = await axios.post(
-        `${url}/product/remove`,
+        `${url}/api/product/remove`,
         { id: productId },
         { headers: { token: localStorage.getItem('adminToken') } }
       );
@@ -49,24 +49,31 @@ const List = () => {
     <div className="list add flex-col">
       <p>All Products List</p>
       <div className="list-table">
-        <div className="list-table-format title">
-          <b>Image</b>
-          <b>Name</b>
-          <b>Category</b>
-          <b>Price</b>
-          <b>Action</b>
-        </div>
-        {list.map((item) => (
-          <div key={item.id} className="list-table-format">
-            <img src={`${url}/images/${item.image}`} alt={item.name} />
-            <p>{item.name}</p>
-            <p>{item.category}</p>
-            <p>${item.price}</p>
-            <p onClick={() => removeProduct(item.id)} className="cursor">X</p>
-          </div>
-        ))}
+        <table>
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {list.map((item) => (
+              <tr key={item.id}>
+                <td><img src={`${url}/uploads/${item.image}`} alt={item.name} width="50" /></td>
+                <td>{item.name}</td>
+                <td>{item.category}</td>
+                <td>${item.price}</td>
+                <td><button onClick={() => removeProduct(item.id)}>Remove</button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
+
   );
 };
 

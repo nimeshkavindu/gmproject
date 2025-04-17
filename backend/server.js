@@ -5,9 +5,13 @@ import productRouter from "./routes/productRoute.js";
 import cartRouter from "./routes/cartRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import 'dotenv/config';
+import cors from "cors";
 
-// App Config
 const app = express();
+
+// Enable CORS for all requests
+app.use(cors());
+// App Config
 const port = process.env.PORT || 4000;
 
 // Validate environment variables

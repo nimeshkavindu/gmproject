@@ -5,7 +5,8 @@ import { assets } from '../../assets/assets';
 import { useNavigate } from 'react-router-dom';
 
 const ProductItem = ({ id, name, price, description, image }) => {
-  const { cartItems, addToCart, removeFromCart, url } = useContext(StoreContext);
+  // Default cartItems to {} if undefined
+  const { cartItems = {}, addToCart, removeFromCart, url, currency } = useContext(StoreContext);
   const navigate = useNavigate();
 
   return (
@@ -14,7 +15,7 @@ const ProductItem = ({ id, name, price, description, image }) => {
         <img
           className='product-item-image'
           src={`${url}/images/${image}`}
-          alt=''
+          alt={name}
           onClick={() => navigate(`/product/${id}`)}
         />
         {!cartItems[id] ? (
@@ -22,20 +23,20 @@ const ProductItem = ({ id, name, price, description, image }) => {
             className='add'
             onClick={() => addToCart(id)}
             src={assets.add_icon_white}
-            alt=''
+            alt='Add'
           />
         ) : (
           <div className='product-item-counter'>
             <img
               onClick={() => removeFromCart(id)}
               src={assets.remove_icon_red}
-              alt=''
+              alt='Remove'
             />
             <p>{cartItems[id]}</p>
             <img
               onClick={() => addToCart(id)}
               src={assets.add_icon_green}
-              alt=''
+              alt='Add'
             />
           </div>
         )}
@@ -45,7 +46,7 @@ const ProductItem = ({ id, name, price, description, image }) => {
           <p>{name}</p>
         </div>
         <p className='product-item-desc'>{description}</p>
-        <p className='product-item-price'>${price}</p>
+        <p className='product-item-price'>{currency}{price}</p>
       </div>
     </div>
   );
